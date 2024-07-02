@@ -2,17 +2,21 @@
 import './App.css';
 import {useEffect  , useState} from "react"
 import Image from './logo.jpg'
-import { ReactTyped } from "react-typed";
+import { ReactTyped  , Typed } from "react-typed";
 import {HashLoader}  from "react-spinners"; 
 
 
 
 function App() {
 
+
   const replaceNewlinesWithBr = (text) => {
     return text.replace(/\n\s*\n/g, '<br><br>').replace(/\n/g, '<br>');
   };
 
+
+  
+  const [typed, setTyped] = useState(null);
   const [prompt, setprompt] = useState("")
   const [loading ,setloading]  = useState(false)
   const [strings , setstrings]  = useState(
@@ -36,20 +40,24 @@ function App() {
       body : JSON.stringify({prompt : prompt})
     })
     const data = await response.json()
-    console.log(data)
-    setloading(false)
-    setprompt("")
-    console.log(data.data.result)
-    const promptString = replaceNewlinesWithBr(data.data.result)
-    
-    setstrings([promptString])
+
+    if(data.success){
+
+      setloading(false)
+      setprompt("")
+      const promptString = replaceNewlinesWithBr(data.data.result)
+      
+      setstrings([promptString])
+    }else{
+      setstrings(["Something Went Wrong!"])
+
+    }
+
     setspeed(10)
     setuseloop(false)
   }
 
-  useEffect(()=>{
- 
-  },[])
+
   const handleChange = (e)=>{
     setprompt(e.target.value)
   }
@@ -81,10 +89,10 @@ function App() {
             <div className="text-white font-bold text-2xl" > AlphaBot </div> 
             </div>
 
-            <div className="chatbox h-[75%]  ">
+            <div className="chatbox h-[75%] no-scrollbar overflow-auto   ">
               {!loading && 
 
-              <ReactTyped strings={strings} typeSpeed={speed} style={{color : "white"}}  loop={useloop}/>
+              <ReactTyped strings={strings}  typedRef={setTyped} typeSpeed={speed} style={{color : "white"}}  loop={useloop}/>
             
             }
 
